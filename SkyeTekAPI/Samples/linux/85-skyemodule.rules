@@ -1,0 +1,5 @@
+SUBSYSTEM=="usb", 
+ENV{DEVTYPE}="usb_device",
+ATTRS{idVendor}=="afef", 
+ATTRS{idProduct}=="0f01", 
+MODE:="0666"
