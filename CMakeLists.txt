@@ -42,9 +42,6 @@ set(LIBRARY_FILES
 
 ADD_LIBRARY(SkyeTekAPI STATIC ${LIBRARY_FILES})
 
-# SET_TARGET_PROPERTIES(SkyeTekAPI PROPERTIES IMPORTED_LOCATION ./SkyeTekAPI/unix/libstapi.a)
-# set_property(TARGET SkyeTekAPI PROPERTY IMPORTED_LOCATION "SkyeTekAPI/unix/libstapi.a")
-
 add_executable(skyetek_mqtt ${SOURCE_FILES})
 target_link_libraries(skyetek_mqtt ${PAHO_LIBRARY} SkyeTekAPI ${LIBUSB_LIBRARY} )
 
