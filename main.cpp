@@ -9,7 +9,7 @@
 #include "SkyeTekProtocol.h"
 
 #define ADDRESS     "tcp://localhost:1883"
-#define CLIENTID    "ExampleClientPub"
+#define CLIENTID    "SkyeTekMQTT"
 //#define TOPIC       "MQTT Examples"
 //#define PAYLOAD     "Hello World!"
 #define QOS         1
@@ -132,10 +132,11 @@ int main(int argc, char *argv[]) {
     }
     SkyeTek_FreeDevices(devices, numDevices);
     SkyeTek_FreeReaders(readers, numReaders);
-    usleep(delay);
+//    usleep(delay);
 
     MQTTClient_disconnect(client, 10000);
     MQTTClient_destroy(&client);
 
+    rc = -2;
     return rc;
 }

@@ -33,21 +33,13 @@ ENV LC_ALL C.UTF-8
 # RUN apt-get install -y git
 
 # Get and build Paho client
-RUN git clone http://git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.c.git /tmp/paho
 WORKDIR /tmp/paho
-RUN make
-RUN make install
+RUN git clone http://git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.c.git /tmp/paho && make && make install
 
 # Get and build skyetek-mqtt
-RUN git clone https://github.com/MikeStankavich/skyetek-mqtt /tmp/skyetek-mqtt
 WORKDIR /tmp/skyetek-mqtt/build
-RUN cmake ..
-RUN make
-RUN cp /tmp/skyetek-mqtt/build/skyetek_mqtt /usr/local/sbin/
-
-WORKDIR /root
+RUN git clone https://github.com/MikeStankavich/skyetek-mqtt /tmp/skyetek-mqtt && RUN cmake .. && make && cp /tmp/skyetek-mqtt/build/skyetek_mqtt /usr/local/sbin/
 
 
 # what about that skyetek usb permission annoyance?
-CMD ["service" "mosquitto" "start"]
-CMD ["skyetek-mqtt"]
+CMD ["service mosquitto start", "skyetek-mqtt"]
