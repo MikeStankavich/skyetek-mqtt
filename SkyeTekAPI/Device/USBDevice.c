@@ -352,7 +352,7 @@ USBDevice_Close(LPSKYETEK_DEVICE device)
 	//usb_reset(usbDevice->usbDevHandle);
 	//usb_close(usbDevice->usbDevHandle);
 	usb_reset(usbDevice->usbDevHandle);
-	//printf("libusb: usb_reset\n");
+	printf("libusb: usb_reset\n");
 	#endif 
 
 	device->writeFD = device->readFD = 0;
@@ -393,46 +393,46 @@ start:
 
 				if(usb_get_driver_np (usbDevice->usbDevHandle, 0, DriverName, 31) == 0)
 				{
-					//printf("libusb: driver = %s\n", DriverName);
-					//printf("libusb: usb_get_driver_np\n");
+					printf("libusb: driver = %s\n", DriverName);
+					printf("libusb: usb_get_driver_np\n");
 					if(strcmp(DriverName, "usbhid") == 0)
 					{
-						//printf("libusb: device claimed by usbhid\n");
+						printf("libusb: device claimed by usbhid\n");
 						if(usb_detach_kernel_driver_np(usbDevice->usbDevHandle, 0) == 0)
 						{
-							//printf("libusb: usb_detach_kernel_driver_np\n");
+							printf("libusb: usb_detach_kernel_driver_np\n");
 						}
 						else
 						{
-							//printf("libusb: FAIL usb_detach_kernel_driver_np\n");
+							printf("libusb: FAIL usb_detach_kernel_driver_np\n");
 						}
 						if(usb_set_configuration(usbDevice->usbDevHandle, 1) == 0)
 						{
-							//printf("libusb: usb_set_configuration\n");
+							printf("libusb: usb_set_configuration\n");
 						}
 						else
 						{
-							//printf("libusb: FAIL usb_set_configuration\n");
+							printf("libusb: FAIL usb_set_configuration\n");
 						}
 						if(usb_claim_interface(usbDevice->usbDevHandle, 0) == 0)
 						{
-							//printf("libusb: usb_claim_interface\n");
+							printf("libusb: usb_claim_interface\n");
 						}
 						else
 						{
-							//printf("libusb: FAIL usb_claim_interface\n");
+							printf("libusb: FAIL usb_claim_interface\n");
 						}
 						
 					}
 					else
 					{
-						//printf("libusb: device NOT claimed by usbhid\n");
+						printf("libusb: device NOT claimed by usbhid\n");
 					}
 
 				}
 				else
 				{
-					//printf("libusb: FAIL usb_get_driver_np\n");
+					printf("libusb: FAIL usb_get_driver_np\n");
 				}
 
 				/*
