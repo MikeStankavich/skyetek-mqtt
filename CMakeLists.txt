@@ -12,7 +12,8 @@ include_directories(SkyeTekAPI)
 
 add_definitions( -DLINUX -DHAVE_PTHREAD -DHAVE_LIBUSB )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 set(SOURCE_FILES main.cpp)
 set(LIBRARY_FILES
