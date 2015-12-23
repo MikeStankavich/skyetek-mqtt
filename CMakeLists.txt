@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.0)
 project(skyetek_mqtt)
 
 #find_path(USB_INCLUDE_DIR libusb.h /usr/include/usb)
