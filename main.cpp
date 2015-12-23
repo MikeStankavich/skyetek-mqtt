@@ -15,7 +15,7 @@
 #define QOS         1
 #define TIMEOUT     5000L
 
-void getTimestamp(TCHAR * buf) {
+void getTimestamp(TCHAR *buf) {
 
     time_t timer;
     struct tm *tm_info;
@@ -30,20 +30,24 @@ unsigned char isStop = 0;
 MQTTClient client;
 TCHAR mqttTopic[256] = "";
 
-unsigned char SelectLoopCallback(LPSKYETEK_TAG lpTag, void *user) {
+int PublishTag(LPSKYETEK_TAG lpTag, unsigned char antennaId) {
 
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     MQTTClient_message pubmsg = MQTTClient_message_initializer;
     MQTTClient_deliveryToken token;
     int rc;
+    TCHAR payload[128] = "";
 
     TCHAR ts[32] = "";
 
     if (!isStop && lpTag != NULL) {
         getTimestamp(ts);
-        printf("skyetek-mqtt [%s]: Type: %s; Tag: %s\n", ts, SkyeTek_GetTagTypeNameFromType(lpTag->type), lpTag->friendly);
+        printf("skyetek-mqtt [%s]: Antenna: %x; Tag: %s\n", ts, antennaId, lpTag->friendly);
+        sprintf(payload,
+                "{\"readAt\":\"[%s]\",\"antennaId\":\"%x\",\"tagId\":\"%s\"}",
+                ts, antennaId, lpTag->friendly);
 
-        pubmsg.payload = (void *) lpTag->friendly;
+        pubmsg.payload = (void *) payload;
         pubmsg.payloadlen = strlen(lpTag->friendly);
         pubmsg.qos = QOS;
         pubmsg.retained = 0;
@@ -58,24 +62,74 @@ unsigned char SelectLoopCallback(LPSKYETEK_TAG lpTag, void *user) {
     return (!isStop);
 }
 
-int CallSelectTags(LPSKYETEK_READER lpReader) {
+int CallGetTags(LPSKYETEK_READER lpReader, unsigned char antennaId) {
     SKYETEK_STATUS st;
+    SKYETEK_TAGTYPE tagType = AUTO_DETECT;
+    LPSKYETEK_TAG *lpTags = NULL;
+    unsigned short count = 0;
 
-    memset(mqttTopic, 0, 256 * sizeof(TCHAR));
-    _stprintf(mqttTopic, "SkyeT1ek/%s", lpReader->rid);
-    printf("topic: %s\n", mqttTopic);
+    printf("Reading tags from antenna %x...\n", antennaId);
 
-    // the SkyeTek_SelectTags function does not return until the loop is done
-    printf("Entering select loop...\n");
-    st = SkyeTek_SelectTags(lpReader, AUTO_DETECT, SelectLoopCallback, 0, 1, NULL);
+    st = SkyeTek_GetTags(lpReader, tagType, &lpTags, &count);
     if (st != SKYETEK_SUCCESS) {
-        printf("Select loop failed\n");
-        return 0;
+        printf("No tags found\n");
     }
-    printf("Select loop done\n");
-    return 1;
+    int ti;
+    for (ti = 0;
+         ti < count;
+         ti++) {
+        printf("Found tag: %s\n", lpTags[ti]->friendly);
+//        PublishTag(lpTags[ti], antennaId);
+    }
+    SkyeTek_FreeTags(lpReader, lpTags, count);
 }
 
+int SwitchAntenna(LPSKYETEK_READER lpReader, unsigned char *antennaId) {
+    // variables
+    //    unsigned int i;
+    //    double f;
+    LPSKYETEK_DATA lpData;
+
+    // get system parameter
+    SKYETEK_STATUS st = SkyeTek_GetSystemParameter(lpReader, SYS_MUX_CONTROL, &lpData);
+    if (st != SKYETEK_SUCCESS) {
+        printf("error: could not get SYS_MUX_CONTROL: %s\n", SkyeTek_GetStatusMessage(st));
+        goto failure;
+    }
+    // check value
+    if (lpData == NULL || lpData->size == 0) {
+        printf("error: SYS_MUX_CONTROL is NULL or empty\n");
+        goto failure;
+    }
+    // print value
+    printf("current SYS_MUX_CONTROL is: %x\n", lpData->data[0]);
+
+    //    SkyeTek_FreeData(lpData);
+    //    lpData = SkyeTek_AllocateData(1);
+    lpData->data[0] ^= 0x01;
+    *antennaId = lpData->data[0];
+    printf("new SYS_MUX_CONTROL is: %x\n", lpData->data[0]);
+
+    // set system parameter
+    st = SkyeTek_SetSystemParameter(lpReader, SYS_MUX_CONTROL, lpData);
+    if (st != SKYETEK_SUCCESS) {
+        printf("error: could not set SYS_MUX_CONTROL: %s\n", SkyeTek_GetStatusMessage(st));
+        goto failure;
+    }
+    printf("successfully set SYS_MUX_CONTROL\n");
+    SkyeTek_FreeData(lpData);  // do nothing if NULL
+    printf("done\n");
+    return 1;
+
+    failure:
+    SkyeTek_FreeData(lpData);  // do nothing if NULL
+    return 0;
+
+}
+
+void stdump(TCHAR *msg) {
+    printf("SkyeTek Debug: %s", msg);
+}
 
 int main(int argc, char *argv[]) {
 
@@ -96,6 +150,8 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
+    // SkyeTek_SetDebugger((SKYETEK_DEBUG_CALLBACK) stdump );
+
     LPSKYETEK_DEVICE *devices = NULL;
     LPSKYETEK_READER *readers = NULL;
     LPSKYETEK_TAG *tags = NULL;
@@ -107,6 +163,7 @@ int main(int argc, char *argv[]) {
     const int iterations = 2;    //number of select tag operations to perform for each test
     int failures = 0;
     int total = 0;
+    unsigned char antennaId = 0;
 
     if ((numDevices = SkyeTek_DiscoverDevices(&devices)) > 0) {
         //printf("example: devices=%d", numDevices);
@@ -116,7 +173,49 @@ int main(int argc, char *argv[]) {
                 getTimestamp(ts);
                 printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
                        readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
-                CallSelectTags(readers[i]);
+//                CallSelectTags(readers[i]);
+//                 variables
+//                printf("call reset\n");
+//                SkyeTek_ResetDevice(readers[i]);
+//                sleep(2);
+//                SkyeTek_DiscoverDevices(&devices);
+//                printf("example: devices=%d", numDevices);
+//                SkyeTek_DiscoverReaders(devices, numDevices, &readers);
+//                printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
+//                       readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
+//                sleep(2);
+//                printf("call get tags\n");
+//                CallGetTags(readers[i], antennaId);
+//                SwitchAntenna(readers[i], &antennaId);
+//                sleep(2);
+//                printf("call get tags\n");
+//                CallGetTags(readers[i], antennaId);
+                LPSKYETEK_DEVICE *devices = NULL;
+                LPSKYETEK_READER *readers = NULL;
+
+                SkyeTek_DiscoverDevices(&devices);
+                printf("skyetek-mqtt: devices=%d", numDevices);
+                SkyeTek_DiscoverReaders(devices, numDevices, &readers);
+                printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
+                       readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
+
+                int loopCount = 0;
+                while (SwitchAntenna(readers[i], &antennaId)) {
+                    CallGetTags(readers[i], antennaId);
+                    if (loopCount++ > 1000) {
+                        printf("call reset\n");
+                        loopCount = 0;
+                        SkyeTek_ResetDevice(readers[i]);
+                        sleep(2);
+                        SkyeTek_DiscoverDevices(&devices);
+                        printf("skyetek-mqtt: devices=%d", numDevices);
+                        SkyeTek_DiscoverReaders(devices, numDevices, &readers);
+                        printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
+                               readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
+                    }
+                }
+
+                // SkyeTek_SetSystemParameter(readers[i], SYS_MUX_CONTROL, )
             }
         }
         else {
@@ -139,3 +238,4 @@ int main(int argc, char *argv[]) {
 
     return rc;
 }
+

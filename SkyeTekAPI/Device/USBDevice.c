@@ -240,10 +240,12 @@ USBDevice_internalFlush(LPSKYETEK_DEVICE device, unsigned char lockSendBuffer)
 	sendBuffer[0] = (usbDevice->sendBufferWritePtr - usbDevice->sendBuffer);
 	memcpy((sendBuffer + 1), usbDevice->sendBuffer, sendBuffer[0]);
 
-	/*printf("Writing - %d\r\n", sendBuffer[0]);
-	for(size_t ix = 0; ix < sendBuffer[0]; ix++)
+
+	printf("Writing - %d\r\n", sendBuffer[0]);
+	size_t ix;
+	for(ix = 0; ix <= sendBuffer[0]; ix++)
 		printf("%02x", sendBuffer[ix]);
-	printf("\r\n");*/
+	printf("\r\n");
 
 	
 	if((result = usb_interrupt_write(usbDevice->usbDevHandle, 1, sendBuffer, 64, 100)) < 0)		
@@ -309,11 +311,12 @@ again:
 	usbDevice->packetParity++;
 #endif
 
-	/*printf("Reading - %d \r\n", receiveBuffer[0]);
-	for(size_t ix = 0; ix < receiveBuffer[0]; ix++)
+	size_t ix;
+	printf("Reading - %d \r\n", receiveBuffer[0]);
+	for(ix = 0; ix < receiveBuffer[0]; ix++)
 		printf("%02x", receiveBuffer[ix]);
-	printf("\r\n");*/
-	
+	printf("\r\n");
+
 	memcpy(usbDevice->receiveBuffer, (receiveBuffer + 1), receiveBuffer[0]);
 	usbDevice->receiveBufferWritePtr = usbDevice->receiveBuffer + receiveBuffer[0];
 
@@ -504,12 +507,26 @@ USBDevice_Write(LPSKYETEK_DEVICE device,
 
 	ptr = buffer;
 
+//	int i;
+//	printf("usb device write: %d\n", length);
+//	for (i=0;i<length;i++) {
+//		printf("0x%02x, ", buffer[i]);
+//	}
+//	printf("\n");
+
 	MUTEX_LOCK(&usbDevice->sendBufferMutex);
 	while(length > 0)
 	{
 		writeSize = usbDevice->endOfSendBuffer - (unsigned int)usbDevice->sendBufferWritePtr;
 
 		writeSize = (length > writeSize) ? writeSize : length;
+
+//		int i;
+//		printf("usb device write: %d\n", writeSize);
+//		for (i=0;i<writeSize;i++) {
+//			printf("0x%02x, ", ptr[i]);
+//		}
+//		printf("\n");
 
 		memcpy(usbDevice->sendBufferWritePtr, ptr, writeSize);
 		

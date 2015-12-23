@@ -1,6 +1,6 @@
 /**
  * CRC.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * CRC funtions.
  */
@@ -99,8 +99,10 @@ unsigned short crc16(unsigned short preset, unsigned char *dataP, unsigned short
             crc_16 >>= 1;
       
         }
+//		printf("%02x:",dataP[0]);
     
     }
+//	printf("  %04x\n",crc_16);
   
   return(crc_16);  /* returns calculated crc (16 bits) */
 }

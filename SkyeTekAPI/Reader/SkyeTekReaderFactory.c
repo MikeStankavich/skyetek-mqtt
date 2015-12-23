@@ -1,6 +1,6 @@
 /**
- * SkyeTekReaderFactory.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * `kyeTekReaderFactory.c
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the SkyeTekReaderFactory.
  */
