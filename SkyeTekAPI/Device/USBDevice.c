@@ -9,7 +9,9 @@
 #include "Device.h"
 #include "USBDevice.h"
 #include <stdlib.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 
 #ifdef HAVE_LIBUSB
 #include <usb.h>
@@ -240,13 +242,13 @@ USBDevice_internalFlush(LPSKYETEK_DEVICE device, unsigned char lockSendBuffer)
 	sendBuffer[0] = (usbDevice->sendBufferWritePtr - usbDevice->sendBuffer);
 	memcpy((sendBuffer + 1), usbDevice->sendBuffer, sendBuffer[0]);
 
-
+#ifdef USB_DEBUG
 	printf("Writing - %d\r\n", sendBuffer[0]);
 	size_t ix;
 	for(ix = 0; ix <= sendBuffer[0]; ix++)
 		printf("%02x", sendBuffer[ix]);
 	printf("\r\n");
-
+#endif
 	
 	if((result = usb_interrupt_write(usbDevice->usbDevHandle, 1, sendBuffer, 64, 100)) < 0)		
 	{
@@ -300,7 +302,7 @@ again:
 			flushBuffer[2] = 0x00;
 		
 			USBDevice_Write(device, flushBuffer, 3, 100);
-			USBDevice_Flush();
+			USBDevice_Flush(device);
 			retried = 1;
 		}
 #endif
@@ -311,12 +313,13 @@ again:
 	usbDevice->packetParity++;
 #endif
 
+#ifdef USB_DEBUG
 	size_t ix;
 	printf("Reading - %d \r\n", receiveBuffer[0]);
 	for(ix = 0; ix < receiveBuffer[0]; ix++)
 		printf("%02x", receiveBuffer[ix]);
 	printf("\r\n");
-
+#endif
 	memcpy(usbDevice->receiveBuffer, (receiveBuffer + 1), receiveBuffer[0]);
 	usbDevice->receiveBufferWritePtr = usbDevice->receiveBuffer + receiveBuffer[0];
 

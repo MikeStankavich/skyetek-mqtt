@@ -1,6 +1,6 @@
 /**
  * SkyeTekAPI.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the SkyeTek C-API.
  */
@@ -18,7 +18,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 
 #ifdef WIN32
 #ifndef WINCE

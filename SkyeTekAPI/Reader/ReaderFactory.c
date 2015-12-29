@@ -1,6 +1,6 @@
 /**
  * ReaderFactory.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the ReaderFactory.
  */
@@ -9,7 +9,9 @@
 #include "ReaderFactory.h"
 #include <string.h>
 #include <stdlib.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 
 static LPREADER_FACTORY ReaderFactories[] = {
   &SkyetekReaderFactory

@@ -1,6 +1,6 @@
 /**
  * SPIDeviceFactory.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the SPIDeviceFactory.
  */
@@ -11,7 +11,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef LINUX
 #include <malloc.h>
+#endif
 
 static unsigned int g_spiDevCount = 0;
 

@@ -1,7 +1,9 @@
 #include "asn1.h"
 #
 #if defined(WIN32) || defined(WINCE) 
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 #define alloca _alloca
 #else
 #include <alloca.h>

@@ -173,23 +173,7 @@ int main(int argc, char *argv[]) {
                 getTimestamp(ts);
                 printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
                        readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
-//                CallSelectTags(readers[i]);
-//                 variables
-//                printf("call reset\n");
-//                SkyeTek_ResetDevice(readers[i]);
-//                sleep(2);
-//                SkyeTek_DiscoverDevices(&devices);
-//                printf("example: devices=%d", numDevices);
-//                SkyeTek_DiscoverReaders(devices, numDevices, &readers);
-//                printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
-//                       readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
-//                sleep(2);
-//                printf("call get tags\n");
-//                CallGetTags(readers[i], antennaId);
-//                SwitchAntenna(readers[i], &antennaId);
-//                sleep(2);
-//                printf("call get tags\n");
-//                CallGetTags(readers[i], antennaId);
+
                 LPSKYETEK_DEVICE *devices = NULL;
                 LPSKYETEK_READER *readers = NULL;
 
@@ -199,12 +183,13 @@ int main(int argc, char *argv[]) {
                 printf("skyetek-mqtt [%s]: Reader Found: %s-%s-%s-%s-%s\n", ts, readers[i]->rid, readers[i]->friendly,
                        readers[i]->manufacturer, readers[i]->model, readers[i]->firmware);
 
-                int loopCount = 0;
+                int loopCount = 1;
                 while (SwitchAntenna(readers[i], &antennaId)) {
+                    printf("\ntest iteration: %d\n", loopCount);
                     CallGetTags(readers[i], antennaId);
-                    if (loopCount++ > 1000) {
+                    if (loopCount++ % 1000 == 0) {
                         printf("call reset\n");
-                        loopCount = 0;
+//                        loopCount = 0;
                         SkyeTek_ResetDevice(readers[i]);
                         sleep(2);
                         SkyeTek_DiscoverDevices(&devices);

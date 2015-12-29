@@ -1,6 +1,6 @@
 /**
  * SPIDevice.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the SPIDevice.c
  */
@@ -9,7 +9,9 @@
 #include "Device.h"
 #include "SPIDevice.h"
 #include <stdlib.h>
+#ifdef LINUX
 #include <malloc.h>
+#endif
 
 SKYETEK_STATUS 
 SPIDevice_Open(LPSKYETEK_DEVICE device)

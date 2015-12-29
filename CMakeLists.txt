@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(skyetek_mqtt)
 
-#find_path(USB_INCLUDE_DIR libusb.h /usr/include/usb)
+find_path(USB_INCLUDE_DIR libusb.h /usr/include/usb)
 #find_path(MALLOC_INCLUDE_DIR malloc.h /usr/include/sys)
 find_path(PAHO_INCLUDE_DIR NAMES MQTTClient.h)
 
@@ -9,6 +9,8 @@ find_library(PAHO_LIBRARY NAMES libpaho-mqtt3c.so)
 find_library(LIBUSB_LIBRARY NAMES usb)
 
 include_directories(SkyeTekAPI)
+include_directories("/usr/local/Cellar/libusb-compat/0.1.5/include")
+include_directories("/usr/local/include")
 
 add_definitions( -DLINUX -DHAVE_PTHREAD -DHAVE_LIBUSB )
 

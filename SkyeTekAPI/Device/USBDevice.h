@@ -1,6 +1,6 @@
 /**
  * USBDevice.h
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  */
 #ifndef USB_DEVICE_H
@@ -50,6 +50,9 @@ int
 USBDevice_Free(
   LPSKYETEK_DEVICE    device
   );
+
+void
+USBDevice_Flush(LPSKYETEK_DEVICE device);
 
 
 #ifdef __cplusplus

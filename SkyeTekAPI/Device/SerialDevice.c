@@ -1,6 +1,6 @@
 /**
  * SerialDevice.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the SerialDevice.c
  */
@@ -9,7 +9,9 @@
 #include "Device.h"
 #include "SerialDevice.h"
 #include <stdlib.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 #include <string.h>
 
 #ifndef WIN32

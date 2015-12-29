@@ -1,6 +1,6 @@
 /**
  * DeviceFactory.c
- * Copyright © 2006 - 2008 Skyetek, Inc. All Rights Reserved.
+ * Copyright ï¿½ 2006 - 2008 Skyetek, Inc. All Rights Reserved.
  *
  * Implementation of the DeviceFactory.
  */
@@ -11,7 +11,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 
 static LPDEVICE_FACTORY DeviceFactories[] = {
 #if defined(WIN32) && !defined(WINCE) && defined(STAPI_SPI)
